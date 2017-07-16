@@ -74,4 +74,10 @@ describe('factory', () => {
 
         expect(vm.$store.state.bar.baz.three).to.equal('updated three');
     });
+
+    it('throws an error when the vuex module was not found', () => {
+        const badRender = () => render({}, { 'badModule': { foo: 'bar' }});
+
+        expect(badRender).to.throw;
+    });
 });

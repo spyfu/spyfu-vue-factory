@@ -1,0 +1,15 @@
+machine:
+  environment:
+    PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
+
+dependencies:
+  override:
+    - yarn
+  cache_directories:
+    - ~/.cache/yarn
+
+test:
+  override:
+    - yarn test
+  post:
+    - bash <(curl -s https://codecov.io/bash) -t 6c6f9c16-50f3-4aa7-b030-06d11ad56538

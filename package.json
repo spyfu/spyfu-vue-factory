@@ -1,6 +1,6 @@
 {
   "name": "spyfu-vue-factory",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Unit testing factory for Vue components.",
   "main": "dist/spyfu-vue-factory.js",
   "module": "dist/spyfu-vue-factory.esm.js",
@@ -30,10 +30,10 @@
   ],
   "homepage": "https://github.com/rollup/rollup-starter-project#readme",
   "dependencies": {
-      "vue-router": "^2.7.0",
-      "vue": "^2.4.1",
-      "vuex-router-sync": "^4.2.0",
-      "vuex": "^2.3.1"
+    "vue-router": "^2.7.0",
+    "vue": "^2.4.1",
+    "vuex-router-sync": "^4.2.0",
+    "vuex": "^2.3.1"
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",

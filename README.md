@@ -13,7 +13,7 @@ This utility creates factory functions for Vue components. To get started, insta
 
 ```bash
 # install through npm
-$ npm install spyfu-vuex-helpers
+$ npm install spyfu-vue-factory
 
 # or with yarn
 $ yarn add spyfu-vue-factory

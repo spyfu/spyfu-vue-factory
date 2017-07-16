@@ -59,3 +59,9 @@ const vm = mount({
     },
 });
 ```
+
+### License
+
+[MIT](https://github.com/spyfu/spyfu-vue-factory/blob/master/LICENSE)
+
+Copyright (c) 2017-present, [SpyFu](https://spyfu.com)

@@ -22,13 +22,13 @@
   "author": "SpyFu",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rollup/rollup-starter-project/issues"
+    "url": "https://github.com/spyfu/spyfu-vue-factory/issues"
   },
   "files": [
     "lib",
     "dist"
   ],
-  "homepage": "https://github.com/rollup/rollup-starter-project#readme",
+  "homepage": "https://github.com/spyfu/spyfu-vue-factory#readme",
   "dependencies": {
     "vue-router": "^2.7.0",
     "vue": "^2.4.1",

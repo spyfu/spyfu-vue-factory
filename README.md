@@ -9,7 +9,7 @@
 <a name="installation"></a>
 ### Installation
 
-This utility creates factory functions for Vue components. To get started, install through NPM your Yarn.
+This utility creates factory functions for Vue components. To get started, install through NPM or Yarn.
 
 ```bash
 # install through npm

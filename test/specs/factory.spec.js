@@ -13,7 +13,17 @@ const render = factory({
     modules: {
         foo: {
             namespaced: true,
-            state: { one: 1 },
+            state: {
+                one: 1,
+                deeply: {
+                    nested: {
+                        state: {
+                            foo: 'foo',
+                            bar: 'bar',
+                        },
+                    },
+                },
+            },
         },
         bar: {
             namespaced: true,
@@ -73,6 +83,23 @@ describe('factory', () => {
         });
 
         expect(vm.$store.state.bar.baz.three).to.equal('updated three');
+    });
+
+    it('can overwrite a nested piece of state', () => {
+        const vm = render({}, {
+            foo: {
+                deeply: {
+                    nested: {
+                        state: {
+                            foo: 'whatever',
+                        },
+                    },
+                },
+            },
+        });
+
+        expect(vm.$store.state.foo.deeply.nested.state.foo).to.equal('whatever');
+        expect(vm.$store.state.foo.deeply.nested.state.bar).to.equal('bar');
     });
 
     it('throws an error when the vuex module was not found', () => {

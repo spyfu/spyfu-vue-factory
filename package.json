@@ -30,10 +30,11 @@
   ],
   "homepage": "https://github.com/spyfu/spyfu-vue-factory#readme",
   "dependencies": {
-    "vue-router": "^2.7.0",
+    "deepmerge": "^1.5.2",
     "vue": "^2.4.1",
-    "vuex-router-sync": "^4.2.0",
-    "vuex": "^2.3.1"
+    "vue-router": "^2.7.0",
+    "vuex": "^2.3.1",
+    "vuex-router-sync": "^4.2.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",
@@ -48,10 +49,10 @@
     "eslint": "^4.1.1",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
+    "rollup": "^0.43.0",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-istanbul": "^1.1.0",
     "rollup-watch": "^4.0.0",
-    "rollup": "^0.43.0",
     "sinon": "^2.3.5"
   }
 }

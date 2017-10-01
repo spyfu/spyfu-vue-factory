@@ -48,14 +48,14 @@ const vm = mount({
 });
 ```
 
-Initial Vuex state may be supplied as the second argument. This state will be merged with the default Vuex state.
+Initial Vuex state may be supplied as the second argument. This state will be deeply merged with the default Vuex state.
 
 ```js
 const vm = mount({
     template: `<div>Hello from a test component</div>`,
 }, {
-    'moduleNamespace': {
-        stateKey: 'new value',
+    moduleNamespace: {
+        key: 'new value',
     },
 });
 ```

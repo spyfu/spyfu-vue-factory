@@ -1,4 +1,5 @@
 import { sync } from 'vuex-router-sync';
+import merge from 'deepmerge';
 import Vue from 'vue/dist/vue.common.js';
 import VueRouter from 'vue-router';
 import Vuex from 'vuex';
@@ -66,7 +67,7 @@ function createStore(rawModules, state) {
     var modules = mergeTestState(normalizedModules, state);
 
     // return the instantiated vuex store
-    return new Vuex.Store({ modules: modules, strict: true });
+    return new Vuex.Store({ state: state, modules: modules, strict: true });
 }
 
 // helper function to evaluate the state functions of vuex modules
@@ -111,6 +112,7 @@ function findModule(store, namespace) {
         }
 
         // if we couldn't find the module, throw an error
+        // istanbul ignore next
         throw new Error('Could not find module "' + namespace + '" in store.');
     }, store);
 }
@@ -121,7 +123,7 @@ function mergeTestState(modules, state) {
         var module = findModule(modules, key);
 
         if (module) {
-            module.state = Object.assign({}, module.state, state[key]);
+            module.state = merge(module.state, state[key]);
         }
     });
 

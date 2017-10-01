@@ -1,9 +1,10 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('vuex-router-sync'), require('vue/dist/vue.common.js'), require('vue-router'), require('vuex')) :
-	typeof define === 'function' && define.amd ? define(['vuex-router-sync', 'vue/dist/vue.common.js', 'vue-router', 'vuex'], factory) :
-	(global.spyfuVueFactory = factory(global.vuexRouterSync,global.Vue,global.VueRouter,global.Vuex));
-}(this, (function (vuexRouterSync,Vue,VueRouter,Vuex) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('vuex-router-sync'), require('deepmerge'), require('vue/dist/vue.common.js'), require('vue-router'), require('vuex')) :
+	typeof define === 'function' && define.amd ? define(['vuex-router-sync', 'deepmerge', 'vue/dist/vue.common.js', 'vue-router', 'vuex'], factory) :
+	(global.spyfuVueFactory = factory(global.vuexRouterSync,global.merge,global.Vue,global.VueRouter,global.Vuex));
+}(this, (function (vuexRouterSync,merge,Vue,VueRouter,Vuex) { 'use strict';
 
+merge = merge && 'default' in merge ? merge['default'] : merge;
 Vue = Vue && 'default' in Vue ? Vue['default'] : Vue;
 VueRouter = VueRouter && 'default' in VueRouter ? VueRouter['default'] : VueRouter;
 Vuex = Vuex && 'default' in Vuex ? Vuex['default'] : Vuex;
@@ -71,7 +72,7 @@ function createStore(rawModules, state) {
     var modules = mergeTestState(normalizedModules, state);
 
     // return the instantiated vuex store
-    return new Vuex.Store({ modules: modules, strict: true });
+    return new Vuex.Store({ state: state, modules: modules, strict: true });
 }
 
 // helper function to evaluate the state functions of vuex modules
@@ -116,6 +117,7 @@ function findModule(store, namespace) {
         }
 
         // if we couldn't find the module, throw an error
+        // istanbul ignore next
         throw new Error('Could not find module "' + namespace + '" in store.');
     }, store);
 }
@@ -126,7 +128,7 @@ function mergeTestState(modules, state) {
         var module = findModule(modules, key);
 
         if (module) {
-            module.state = Object.assign({}, module.state, state[key]);
+            module.state = merge(module.state, state[key]);
         }
     });
 

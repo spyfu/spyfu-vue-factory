@@ -1,13 +1,11 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('vuex-router-sync'), require('deepmerge'), require('vue/dist/vue.common.js'), require('vue-router'), require('vuex')) :
-	typeof define === 'function' && define.amd ? define(['vuex-router-sync', 'deepmerge', 'vue/dist/vue.common.js', 'vue-router', 'vuex'], factory) :
-	(global.spyfuVueFactory = factory(global.vuexRouterSync,global.merge,global.Vue,global.VueRouter,global.Vuex));
-}(this, (function (vuexRouterSync,merge,Vue,VueRouter,Vuex) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('deepmerge'), require('vue/dist/vue.common.js')) :
+	typeof define === 'function' && define.amd ? define(['deepmerge', 'vue/dist/vue.common.js'], factory) :
+	(global.spyfuVueFactory = factory(global.merge,global.Vue));
+}(this, (function (merge,Vue) { 'use strict';
 
-merge = merge && 'default' in merge ? merge['default'] : merge;
-Vue = Vue && 'default' in Vue ? Vue['default'] : Vue;
-VueRouter = VueRouter && 'default' in VueRouter ? VueRouter['default'] : VueRouter;
-Vuex = Vuex && 'default' in Vuex ? Vuex['default'] : Vuex;
+merge = merge && merge.hasOwnProperty('default') ? merge['default'] : merge;
+Vue = Vue && Vue.hasOwnProperty('default') ? Vue['default'] : Vue;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
@@ -15,8 +13,126 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
 
-Vue.use(Vuex);
-Vue.use(VueRouter);
+
+
+
+
+var asyncGenerator = function () {
+  function AwaitValue(value) {
+    this.value = value;
+  }
+
+  function AsyncGenerator(gen) {
+    var front, back;
+
+    function send(key, arg) {
+      return new Promise(function (resolve, reject) {
+        var request = {
+          key: key,
+          arg: arg,
+          resolve: resolve,
+          reject: reject,
+          next: null
+        };
+
+        if (back) {
+          back = back.next = request;
+        } else {
+          front = back = request;
+          resume(key, arg);
+        }
+      });
+    }
+
+    function resume(key, arg) {
+      try {
+        var result = gen[key](arg);
+        var value = result.value;
+
+        if (value instanceof AwaitValue) {
+          Promise.resolve(value.value).then(function (arg) {
+            resume("next", arg);
+          }, function (arg) {
+            resume("throw", arg);
+          });
+        } else {
+          settle(result.done ? "return" : "normal", result.value);
+        }
+      } catch (err) {
+        settle("throw", err);
+      }
+    }
+
+    function settle(type, value) {
+      switch (type) {
+        case "return":
+          front.resolve({
+            value: value,
+            done: true
+          });
+          break;
+
+        case "throw":
+          front.reject(value);
+          break;
+
+        default:
+          front.resolve({
+            value: value,
+            done: false
+          });
+          break;
+      }
+
+      front = front.next;
+
+      if (front) {
+        resume(front.key, front.arg);
+      } else {
+        back = null;
+      }
+    }
+
+    this._invoke = send;
+
+    if (typeof gen.return !== "function") {
+      this.return = undefined;
+    }
+  }
+
+  if (typeof Symbol === "function" && Symbol.asyncIterator) {
+    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
+      return this;
+    };
+  }
+
+  AsyncGenerator.prototype.next = function (arg) {
+    return this._invoke("next", arg);
+  };
+
+  AsyncGenerator.prototype.throw = function (arg) {
+    return this._invoke("throw", arg);
+  };
+
+  AsyncGenerator.prototype.return = function (arg) {
+    return this._invoke("return", arg);
+  };
+
+  return {
+    wrap: function (fn) {
+      return function () {
+        return new AsyncGenerator(fn.apply(this, arguments));
+      };
+    },
+    await: function (value) {
+      return new AwaitValue(value);
+    }
+  };
+}();
+
+var vuexIsInstalled = false;
+
+var routerIsInstalled = false;
 
 /**
  * Make a function that returns a component factory.
@@ -28,31 +144,69 @@ var index = function () {
     var factoryOpts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
     factoryOpts.components = factoryOpts.components || {};
-    factoryOpts.modules = factoryOpts.modules || {};
+    // factoryOpts.modules = factoryOpts.modules || {};
     factoryOpts.routes = factoryOpts.routes || [];
 
     //
     // component factory
     //
-    return function (options) {
-        var state = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-        // create a synced router and store for our component
-        var router = createRouter(factoryOpts.routes);
-        var store = createStore(factoryOpts.modules, state);
-        vuexRouterSync.sync(store, router);
-
-        // set up our vm with an in-memory dom element
-        var vm = Object.assign({
+    return function (options, state) {
+        var baseOptions = {
             components: factoryOpts.components,
             el: document.createElement('div'),
-            template: '<div>no template</div>',
-            router: router,
-            store: store
-        }, options);
+            template: '<div>no template</div>'
+        };
+
+        // create a vuex store
+        var store = undefined;
+
+        try {
+            var Vuex = require('vuex');
+
+            if ((factoryOpts.modules || state) && !Vuex.version) {
+                throw new Error();
+            } else {
+                store = createStore(factoryOpts.modules || {}, state || {});
+
+                baseOptions.store = store;
+            }
+        } catch (e) {
+            console.warn('Missing "vuex" dependency, no state will be injected.');
+        }
+
+        // create a vue router
+        var router = undefined;
+
+        try {
+            var VueRouter = require('vue-router');
+
+            if (factoryOpts.routes && !VueRouter.version) {
+                throw new Error();
+            } else {
+                router = createRouter(factoryOpts.routes);
+
+                baseOptions.router = router;
+            }
+        } catch (e) {
+            console.warn('Missing "vue-router" dependency, no router will be injected.');
+        }
+
+        // sync the store with the router
+        if (store && router) {
+            try {
+                var _require = require('vuex-router-sync'),
+                    sync = _require.sync;
+
+                if (sync) {
+                    sync(store, router);
+                }
+            } catch (e) {
+                // continue, regardless of error
+            }
+        }
 
         // finally, return the instantiated vue component
-        return new Vue(vm);
+        return new Vue(Object.assign(baseOptions, options));
     };
 };
 
@@ -60,11 +214,25 @@ var index = function () {
 function createRouter() {
     var routes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
+    var VueRouter = require('vue-router');
+
+    if (!routerIsInstalled) {
+        Vue.use(VueRouter);
+        routerIsInstalled = true;
+    }
+
     return new VueRouter({ abstract: true, routes: routes });
 }
 
 // helper function to create a vuex store instance
 function createStore(rawModules, state) {
+    var Vuex = require('vuex');
+
+    if (!vuexIsInstalled) {
+        Vue.use(Vuex);
+        vuexIsInstalled = true;
+    }
+
     // create a normalized copy of our vuex modules
     var normalizedModules = normalizeModules(rawModules);
 

@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import factory from '../../lib';
 import VueRouter from 'vue-router'
 import Vuex from 'vuex';
+import VuexRouterSync from 'vuex-router-sync';
 import sinon from 'sinon';
 
 // console.log (Vuex);
@@ -9,6 +10,7 @@ import sinon from 'sinon';
 describe('optional dependencies', () => {
     let cachedVuexVersion = Vuex.version;
     let cachedVueRouterVersion = VueRouter.version;
+    let cachedVuexRouterSync = VuexRouterSync.sync;
     let warn;
 
     beforeEach(() => {
@@ -18,6 +20,7 @@ describe('optional dependencies', () => {
     afterEach(() => {
         Vuex.version = cachedVuexVersion;
         VueRouter.version = cachedVueRouterVersion;
+        VuexRouterSync.sync = cachedVuexRouterSync;
         warn.restore();
     });
 
@@ -39,5 +42,14 @@ describe('optional dependencies', () => {
         
         expect(warn.called).to.be.true;
         expect(vm.$router).to.be.undefined;
+    });
+
+    it('vuex-router-sync', () => {
+        VuexRouterSync.sync = undefined;
+        
+        const render = factory({ modules: {}, routes: [] });
+        const vm = render({});
+
+        expect(vm.$store.state.route).to.be.undefined;
     });
 });

@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import factory from '../../lib';
+import VueRouter from 'vue-router'
 import Vuex from 'vuex';
 import sinon from 'sinon';
 
@@ -7,6 +8,7 @@ import sinon from 'sinon';
 
 describe('optional dependencies', () => {
     let cachedVuexVersion = Vuex.version;
+    let cachedVueRouterVersion = VueRouter.version;
     let warn;
 
     beforeEach(() => {
@@ -15,10 +17,11 @@ describe('optional dependencies', () => {
 
     afterEach(() => {
         Vuex.version = cachedVuexVersion;
+        VueRouter.version = cachedVueRouterVersion;
         warn.restore();
     });
 
-    it('treats vuex as an optional dependency', () => {
+    it('vuex', () => {
         Vuex.version = undefined;
 
         const render = factory();
@@ -27,4 +30,14 @@ describe('optional dependencies', () => {
         expect(warn.called).to.be.true;
         expect(vm.$store).to.be.undefined;
     });
-})
+
+    it('vue-router', () => {
+        VueRouter.version = undefined;
+
+        const render = factory({ routes: [] });
+        const vm = render({});
+        
+        expect(warn.called).to.be.true;
+        expect(vm.$router).to.be.undefined;
+    });
+});

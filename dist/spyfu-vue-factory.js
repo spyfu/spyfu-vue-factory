@@ -1,11 +1,29 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('deepmerge'), require('vue/dist/vue.common.js')) :
-	typeof define === 'function' && define.amd ? define(['deepmerge', 'vue/dist/vue.common.js'], factory) :
-	(global.spyfuVueFactory = factory(global.merge,global.Vue));
-}(this, (function (merge,Vue) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('deepmerge')) :
+	typeof define === 'function' && define.amd ? define(['exports', 'deepmerge'], factory) :
+	(factory((global.spyfuVueFactory = {}),global.merge));
+}(this, (function (exports,merge) { 'use strict';
 
 merge = merge && merge.hasOwnProperty('default') ? merge['default'] : merge;
-Vue = Vue && Vue.hasOwnProperty('default') ? Vue['default'] : Vue;
+
+/**
+ * Stub a named route.
+ *
+ * @param  {string} name    the name of the route being stubbed
+ * @return {Array}
+ */
+var stubRoute = function (name) {
+    return {
+        name: name,
+        component: {
+            render: function render(h) {
+                return h('div');
+            },
+            functional: true
+        },
+        path: '/' + name.replace(/[^\w]/g, "-")
+    };
+};
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
@@ -130,6 +148,8 @@ var asyncGenerator = function () {
   };
 }();
 
+var Vue = require('vue/dist/vue.common.js');
+
 var vuexIsInstalled = false;
 
 var routerIsInstalled = false;
@@ -140,7 +160,7 @@ var routerIsInstalled = false;
  * @param  {Object}     factoryOpts
  * @return {Function}
  */
-var index = function () {
+var factory = function () {
     var factoryOpts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
     factoryOpts.components = factoryOpts.components || {};
@@ -221,7 +241,14 @@ function createRouter() {
         routerIsInstalled = true;
     }
 
-    return new VueRouter({ abstract: true, routes: routes });
+    var normalizedRoutes = routes.map(function (route) {
+        return typeof route === 'string' ? stubRoute(route) : route;
+    });
+
+    return new VueRouter({
+        abstract: true,
+        routes: normalizedRoutes
+    });
 }
 
 // helper function to create a vuex store instance
@@ -303,7 +330,10 @@ function mergeTestState(modules, state) {
     return modules;
 }
 
-return index;
+exports.factory = factory;
+exports.stubRoute = stubRoute;
+
+Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 //# sourceMappingURL=spyfu-vue-factory.js.map

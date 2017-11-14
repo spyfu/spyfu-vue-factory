@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import factory from '../../lib';
+import { factory } from '../../lib';
 import VueRouter from 'vue-router'
 import Vuex from 'vuex';
 import VuexRouterSync from 'vuex-router-sync';
@@ -39,14 +39,14 @@ describe('optional dependencies', () => {
 
         const render = factory({ routes: [] });
         const vm = render({});
-        
+
         expect(warn.called).to.be.true;
         expect(vm.$router).to.be.undefined;
     });
 
     it('vuex-router-sync', () => {
         VuexRouterSync.sync = undefined;
-        
+
         const render = factory({ modules: {}, routes: [] });
         const vm = render({});
 

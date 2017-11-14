@@ -1,29 +1,37 @@
 import babel from 'rollup-plugin-babel';
 import babelrc from 'babelrc-rollup';
 import istanbul from 'rollup-plugin-istanbul';
+import resolve from 'rollup-plugin-node-resolve';
+// import vue from 'rollup-plugin-vue';
 
 let pkg = require('./package.json');
 let external = Object.keys(pkg.dependencies);
 let isProduction = process.env.NODE_ENV === 'production';
 
-let targets = [];
-let plugins = [babel(babelrc())];
+let output = [];
+
+let plugins = [
+    babel(babelrc()),
+    resolve({
+        browser: true,
+    }),
+];
 
 //
 // production config
 //
 if (isProduction) {
-    targets.push(
+    output.push(
         {
-            dest: pkg.main,
+            file: pkg.main,
             format: 'umd',
-            moduleName: 'spyfuVueFactory',
-            sourceMap: true,
+            name: 'spyfuVueFactory',
+            sourcemap: true,
         },
         {
-            dest: pkg.module,
+            file: pkg.module,
             format: 'es',
-            sourceMap: true,
+            sourcemap: true,
         }
     )
 }
@@ -41,8 +49,8 @@ else {
 }
 
 export default {
-    entry: 'lib/index.js',
-    plugins: plugins,
     external: external,
-    targets: targets,
+    input: 'lib/index.js',
+    output: output,
+    plugins: plugins,
 };

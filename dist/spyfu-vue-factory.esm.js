@@ -1,5 +1,23 @@
 import merge from 'deepmerge';
-import Vue from 'vue/dist/vue.common.js';
+
+/**
+ * Stub a named route.
+ *
+ * @param  {string} name    the name of the route being stubbed
+ * @return {Array}
+ */
+var stubRoute = function (name) {
+    return {
+        name: name,
+        component: {
+            render: function render(h) {
+                return h('div');
+            },
+            functional: true
+        },
+        path: '/' + name.replace(/[^\w]/g, "-")
+    };
+};
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
@@ -124,6 +142,8 @@ var asyncGenerator = function () {
   };
 }();
 
+var Vue = require('vue/dist/vue.common.js');
+
 var vuexIsInstalled = false;
 
 var routerIsInstalled = false;
@@ -134,7 +154,7 @@ var routerIsInstalled = false;
  * @param  {Object}     factoryOpts
  * @return {Function}
  */
-var index = function () {
+var factory = function () {
     var factoryOpts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
     factoryOpts.components = factoryOpts.components || {};
@@ -215,7 +235,14 @@ function createRouter() {
         routerIsInstalled = true;
     }
 
-    return new VueRouter({ abstract: true, routes: routes });
+    var normalizedRoutes = routes.map(function (route) {
+        return typeof route === 'string' ? stubRoute(route) : route;
+    });
+
+    return new VueRouter({
+        abstract: true,
+        routes: normalizedRoutes
+    });
 }
 
 // helper function to create a vuex store instance
@@ -297,5 +324,5 @@ function mergeTestState(modules, state) {
     return modules;
 }
 
-export default index;
+export { factory, stubRoute };
 //# sourceMappingURL=spyfu-vue-factory.esm.js.map

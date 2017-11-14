@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import factory from '../../lib';
+import { factory } from '../../lib';
 
 //
 // factory

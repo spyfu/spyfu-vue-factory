@@ -25,7 +25,7 @@ $ yarn add spyfu-vue-factory
 To create a component factory, pass any child components, routes, and vuex modules to the `factory` function. All three of these properties are optional.
 
 ```js
-import factory from 'spyfu-vue-factory';
+import { factory } from 'spyfu-vue-factory';
 
 const mount = factory({
     components: {
@@ -57,6 +57,24 @@ const vm = mount({
     moduleNamespace: {
         key: 'new value',
     },
+});
+```
+
+### Stubbing named routes
+
+Occasionally in tests that interact with `vue-router`, you'll see the following error.
+
+```bash
+[vue-router] Route with name 'whatever' does not exist
+```
+
+This is usually caused by trying to render a `<router-link>` component using a named route that your test factory does not know about. To remedy this, simply pass in the route name to the `routes` array.
+
+```js
+const mount = factory({
+    routes: [
+        'whatever',
+    ],
 });
 ```
 

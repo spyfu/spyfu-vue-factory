@@ -25,6 +25,7 @@ const render = factory({
         'v-foo': fooComponent,
     },
     routes: [
+        stubRoute('foo'),
         'some:named:route',
     ],
 })

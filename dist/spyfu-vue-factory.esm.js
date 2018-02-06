@@ -111,6 +111,10 @@ function createRouter() {
 
     var VueRouter = require('vue-router');
 
+    if (typeof VueRouter.default === 'function') {
+        VueRouter = VueRouter.default;
+    }
+
     if (!routerIsInstalled) {
         Vue.use(VueRouter);
         routerIsInstalled = true;
@@ -129,6 +133,10 @@ function createRouter() {
 // helper function to create a vuex store instance
 function createStore(rawModules, state) {
     var Vuex = require('vuex');
+
+    if (typeof Vuex.default !== 'undefined') {
+        Vuex = Vuex.default;
+    }
 
     if (!vuexIsInstalled) {
         Vue.use(Vuex);

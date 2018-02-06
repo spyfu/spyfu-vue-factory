@@ -46,6 +46,8 @@
     "eslint": "^4.1.1",
     "istanbul": "^0.4.5",
     "mocha": "^4.0.1",
+    "mock-require": "^3.0.1",
+    "optional-require": "^1.0.0",
     "rollup": "^0.51.5",
     "rollup-plugin-babel": "^3.0.2",
     "rollup-plugin-istanbul": "^1.1.0",

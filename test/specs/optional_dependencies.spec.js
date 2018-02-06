@@ -1,16 +1,9 @@
 import { expect } from 'chai';
 import { factory } from '../../lib';
-import VueRouter from 'vue-router'
-import Vuex from 'vuex';
-import VuexRouterSync from 'vuex-router-sync';
 import sinon from 'sinon';
-
-// console.log (Vuex);
+import mock from 'mock-require';
 
 describe('optional dependencies', () => {
-    let cachedVuexVersion = Vuex.version;
-    let cachedVueRouterVersion = VueRouter.version;
-    let cachedVuexRouterSync = VuexRouterSync.sync;
     let warn;
 
     beforeEach(() => {
@@ -18,14 +11,14 @@ describe('optional dependencies', () => {
     });
 
     afterEach(() => {
-        Vuex.version = cachedVuexVersion;
-        VueRouter.version = cachedVueRouterVersion;
-        VuexRouterSync.sync = cachedVuexRouterSync;
+        mock.stop('vuex');
+        mock.stop('vue-router');
+        mock.stop('vuex-router-sync');
         warn.restore();
     });
 
     it('vuex', () => {
-        Vuex.version = undefined;
+        mock('vuex', undefined);
 
         const render = factory();
         const vm = render({}, { /* state */ });
@@ -35,7 +28,7 @@ describe('optional dependencies', () => {
     });
 
     it('vue-router', () => {
-        VueRouter.version = undefined;
+        mock('vue-router', undefined);
 
         const render = factory({ routes: [] });
         const vm = render({});
@@ -45,7 +38,7 @@ describe('optional dependencies', () => {
     });
 
     it('vuex-router-sync', () => {
-        VuexRouterSync.sync = undefined;
+        mock('vuex-router-sync', undefined);
 
         const render = factory({ modules: {}, routes: [] });
         const vm = render({});

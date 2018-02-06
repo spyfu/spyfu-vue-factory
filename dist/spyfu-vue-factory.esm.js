@@ -1,5 +1,3 @@
-import merge from 'deepmerge';
-
 /**
  * Stub a named route.
  *
@@ -26,9 +24,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 };
 
 var Vue = require('vue/dist/vue.common.js');
+var optionalRequire = require('optional-require');
+var merge = require('deepmerge');
 
 var vuexIsInstalled = false;
-
 var routerIsInstalled = false;
 
 /**
@@ -58,9 +57,9 @@ var factory = function () {
         var store = undefined;
 
         try {
-            var Vuex = require('vuex');
+            var Vuex = optionalRequire('vuex') || null;
 
-            if ((factoryOpts.modules || state) && !Vuex.version) {
+            if ((factoryOpts.modules || state) && !Vuex) {
                 throw new Error();
             } else {
                 store = createStore(factoryOpts.modules || {}, state || {});
@@ -75,9 +74,9 @@ var factory = function () {
         var router = undefined;
 
         try {
-            var VueRouter = require('vue-router');
+            var VueRouter = optionalRequire('vue-router') || null;
 
-            if (factoryOpts.routes && !VueRouter.version) {
+            if (factoryOpts.routes && !VueRouter) {
                 throw new Error();
             } else {
                 router = createRouter(factoryOpts.routes);
@@ -91,11 +90,10 @@ var factory = function () {
         // sync the store with the router
         if (store && router) {
             try {
-                var _require = require('vuex-router-sync'),
-                    sync = _require.sync;
+                var VuexRouterSync = optionalRequire('vuex-router-sync') || null;
 
-                if (sync) {
-                    sync(store, router);
+                if (VuexRouterSync) {
+                    VuexRouterSync.sync(store, router);
                 }
             } catch (e) {
                 // continue, regardless of error

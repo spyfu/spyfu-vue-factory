@@ -4,6 +4,111 @@
 	(factory((global.spyfuVueFactory = {})));
 }(this, (function (exports) { 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+var isMergeableObject = function isMergeableObject(value) {
+	return isNonNullObject(value) && !isSpecial(value);
+};
+
+function isNonNullObject(value) {
+	return !!value && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object';
+}
+
+function isSpecial(value) {
+	var stringValue = Object.prototype.toString.call(value);
+
+	return stringValue === '[object RegExp]' || stringValue === '[object Date]' || isReactElement(value);
+}
+
+// see https://github.com/facebook/react/blob/b5ac963fb791d1298e7f396236383bc955f916c1/src/isomorphic/classic/element/ReactElement.js#L21-L25
+var canUseSymbol = typeof Symbol === 'function' && Symbol.for;
+var REACT_ELEMENT_TYPE = canUseSymbol ? Symbol.for('react.element') : 0xeac7;
+
+function isReactElement(value) {
+	return value.$$typeof === REACT_ELEMENT_TYPE;
+}
+
+function emptyTarget(val) {
+	return Array.isArray(val) ? [] : {};
+}
+
+function cloneUnlessOtherwiseSpecified(value, optionsArgument) {
+	var clone = !optionsArgument || optionsArgument.clone !== false;
+
+	return clone && isMergeableObject(value) ? deepmerge(emptyTarget(value), value, optionsArgument) : value;
+}
+
+function defaultArrayMerge(target, source, optionsArgument) {
+	return target.concat(source).map(function (element) {
+		return cloneUnlessOtherwiseSpecified(element, optionsArgument);
+	});
+}
+
+function mergeObject(target, source, optionsArgument) {
+	var destination = {};
+	if (isMergeableObject(target)) {
+		Object.keys(target).forEach(function (key) {
+			destination[key] = cloneUnlessOtherwiseSpecified(target[key], optionsArgument);
+		});
+	}
+	Object.keys(source).forEach(function (key) {
+		if (!isMergeableObject(source[key]) || !target[key]) {
+			destination[key] = cloneUnlessOtherwiseSpecified(source[key], optionsArgument);
+		} else {
+			destination[key] = deepmerge(target[key], source[key], optionsArgument);
+		}
+	});
+	return destination;
+}
+
+function deepmerge(target, source, optionsArgument) {
+	var sourceIsArray = Array.isArray(source);
+	var targetIsArray = Array.isArray(target);
+	var options = optionsArgument || { arrayMerge: defaultArrayMerge };
+	var sourceAndTargetTypesMatch = sourceIsArray === targetIsArray;
+
+	if (!sourceAndTargetTypesMatch) {
+		return cloneUnlessOtherwiseSpecified(source, optionsArgument);
+	} else if (sourceIsArray) {
+		var arrayMerge = options.arrayMerge || defaultArrayMerge;
+		return arrayMerge(target, source, optionsArgument);
+	} else {
+		return mergeObject(target, source, optionsArgument);
+	}
+}
+
+deepmerge.all = function deepmergeAll(array, optionsArgument) {
+	if (!Array.isArray(array)) {
+		throw new Error('first argument should be an array');
+	}
+
+	return array.reduce(function (prev, next) {
+		return deepmerge(prev, next, optionsArgument);
+	}, {});
+};
+
+var deepmerge_1 = deepmerge;
+
+var optionalRequire = function (module, options) {
+    try {
+        if (module[0] in { ".": 1 }) {
+            module = process.cwd() + module.substr(1);
+        }
+
+        return require(module);
+    } catch (err) {
+        if (err.code !== "MODULE_NOT_FOUND" && options && options.rethrow) {
+            throw err;
+        }
+    }
+
+    return null;
+};
+
 /**
  * Stub a named route.
  *
@@ -23,16 +128,7 @@ var stubRoute = function (name) {
     };
 };
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
 var Vue = require('vue/dist/vue.common.js');
-var optionalRequire = require('optional-require');
-var merge = require('deepmerge');
-
 var vuexIsInstalled = false;
 var routerIsInstalled = false;
 
@@ -212,7 +308,7 @@ function mergeTestState(modules, state) {
         var module = findModule(modules, key);
 
         if (module) {
-            module.state = merge(module.state, state[key]);
+            module.state = deepmerge_1(module.state, state[key]);
         }
     });
 

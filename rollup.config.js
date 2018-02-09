@@ -1,19 +1,26 @@
 import babel from 'rollup-plugin-babel';
 import babelrc from 'babelrc-rollup';
+import commonjs from 'rollup-plugin-commonjs';
 import istanbul from 'rollup-plugin-istanbul';
+import nodeResolve from 'rollup-plugin-node-resolve';
 import resolve from 'rollup-plugin-node-resolve';
-// import vue from 'rollup-plugin-vue';
 
 let pkg = require('./package.json');
-let external = Object.keys(pkg.dependencies);
 let isProduction = process.env.NODE_ENV === 'production';
 
 let output = [];
 
 let plugins = [
     babel(babelrc()),
-    resolve({
+
+    nodeResolve({
         browser: true,
+        jsnext: true,
+        main: true
+    }),
+
+    commonjs({
+        include: ['node_modules/**']
     }),
 ];
 

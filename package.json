@@ -50,8 +50,9 @@
     "mock-require": "^3.0.1",
     "rollup": "^0.51.5",
     "rollup-plugin-babel": "^3.0.2",
+    "rollup-plugin-commonjs": "^8.3.0",
     "rollup-plugin-istanbul": "^1.1.0",
-    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-node-resolve": "^3.0.2",
     "rollup-plugin-vue": "^2.5.2",
     "rollup-watch": "^4.0.0",
     "sinon": "^4.0.1"

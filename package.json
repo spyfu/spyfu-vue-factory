@@ -1,6 +1,6 @@
 {
   "name": "spyfu-vue-factory",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "Unit testing factory for Vue components.",
   "main": "dist/spyfu-vue-factory.js",
   "module": "dist/spyfu-vue-factory.esm.js",

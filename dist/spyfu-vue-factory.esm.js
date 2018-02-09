@@ -87,22 +87,6 @@ deepmerge.all = function deepmergeAll(array, optionsArgument) {
 
 var deepmerge_1 = deepmerge;
 
-var optionalRequire = function (module, options) {
-    try {
-        if (module[0] in { ".": 1 }) {
-            module = process.cwd() + module.substr(1);
-        }
-
-        return require(module);
-    } catch (err) {
-        if (err.code !== "MODULE_NOT_FOUND" && options && options.rethrow) {
-            throw err;
-        }
-    }
-
-    return null;
-};
-
 /**
  * Stub a named route.
  *
@@ -150,37 +134,35 @@ var factory = function () {
         };
 
         // create a vuex store
+        var Vuex = null;
         var store = undefined;
 
         try {
-            var Vuex = optionalRequire('vuex') || null;
+            Vuex = require('vuex');
+        } catch (e) {}
 
-            if ((factoryOpts.modules || state) && !Vuex) {
-                throw new Error();
-            } else {
-                store = createStore(factoryOpts.modules || {}, state || {});
-
-                baseOptions.store = store;
-            }
-        } catch (e) {
+        if ((factoryOpts.modules || state) && !Vuex) {
             console.warn('Missing "vuex" dependency, no state will be injected.');
+        } else {
+            store = createStore(factoryOpts.modules || {}, state || {});
+
+            baseOptions.store = store;
         }
 
         // create a vue router
+        var VueRouter = null;
         var router = undefined;
 
         try {
-            var VueRouter = optionalRequire('vue-router') || null;
+            VueRouter = require('vue-router');
+        } catch (e) {}
 
-            if (factoryOpts.routes && !VueRouter) {
-                throw new Error();
-            } else {
-                router = createRouter(factoryOpts.routes);
-
-                baseOptions.router = router;
-            }
-        } catch (e) {
+        if (factoryOpts.routes && !VueRouter) {
             console.warn('Missing "vue-router" dependency, no router will be injected.');
+        } else {
+            router = createRouter(factoryOpts.routes);
+
+            baseOptions.router = router;
         }
 
         // sync the store with the router

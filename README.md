@@ -78,6 +78,16 @@ const mount = factory({
 });
 ```
 
+### Stubbing transitions
+
+To replace Vue's `<transition>` component with a synchronous stub, set the `stubTransitions` option to `true`.
+
+```js
+const mount = factory({
+    stubTransitions: true,
+});
+```
+
 ### License
 
 [MIT](https://github.com/spyfu/spyfu-vue-factory/blob/master/LICENSE)

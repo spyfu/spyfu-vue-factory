@@ -5,6 +5,7 @@
   "main": "dist/spyfu-vue-factory.js",
   "module": "dist/spyfu-vue-factory.esm.js",
   "jsnext:main": "dist/spyfu-vue-factory.esm.js",
+  "typings": "types/index.d.ts",
   "scripts": {
     "prebuild": "eslint lib test",
     "build": "cross-env NODE_ENV=production rollup -c",
@@ -26,7 +27,8 @@
   },
   "files": [
     "lib",
-    "dist"
+    "dist",
+    "types/*.d.ts"
   ],
   "homepage": "https://github.com/spyfu/spyfu-vue-factory#readme",
   "dependencies": {
@@ -46,6 +48,7 @@
     "cross-env": "^5.0.1",
     "eslint": "^4.1.1",
     "istanbul": "^0.4.5",
+    "lodash.clonedeep": "^4.5.0",
     "mocha": "^4.0.1",
     "mock-require": "^3.0.1",
     "rollup": "^0.51.5",

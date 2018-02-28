@@ -36,6 +36,7 @@ const render = factory({
             state: () => ({ two: 2 }),
         },
     },
+    stubTransitions: true,
 });
 
 //
@@ -107,4 +108,27 @@ describe('factory', () => {
 
         expect(badRender).to.throw;
     });
+
+    it('replaces transitions with a synchronous stub by default', function(done) {
+        const vm = render({
+            data: () => ({ foo: true }),
+            template: `
+                <transition duration="1000" name="foo">
+                    <div v-if="foo" key="hello">Foo</div>
+                    <div v-else key="bar">Bar</div>
+                </transition>
+            `,
+        });
+
+        expect(vm.$el.outerHTML).to.equal('<div>Foo</div>');
+
+        vm.foo = false;
+
+        // our transition has a duration of 1000ms, but since it's
+        // stubbed in our factory we should be able to use $nextTick
+        vm.$nextTick(() => {
+            expect(vm.$el.outerHTML).to.equal('<div>Bar</div>');
+            done();
+        })
+    })
 });

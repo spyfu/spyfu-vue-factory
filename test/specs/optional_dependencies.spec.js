@@ -42,7 +42,7 @@ describe('optional dependencies', () => {
 
         const render = factory({ modules: {}, routes: [] });
         const vm = render({});
-
+        
         expect(vm.$store.state.route).to.be.undefined;
     });
 });

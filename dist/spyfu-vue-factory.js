@@ -112,9 +112,64 @@ var stubRoute = function (name) {
     };
 };
 
+// unfortunately, we can't use the version of this that is
+// included with vue-test-utils, because they do not use
+// the compiler-included version of Vue as their base.
+// https://github.com/vuejs/vue-test-utils/blob/dev/src/create-local-vue.js
 var Vue = require('vue/dist/vue.common.js');
-var vuexIsInstalled = false;
-var routerIsInstalled = false;
+var cloneDeep = require('lodash.clonedeep');
+// import errorHandler from './lib/error-handler'
+
+var cloneConstructor = function () {
+    var instance = Vue.extend();
+
+    // clone global APIs
+    Object.keys(Vue).forEach(function (key) {
+        if (!instance.hasOwnProperty(key)) {
+            var original = Vue[key];
+            instance[key] = (typeof original === 'undefined' ? 'undefined' : _typeof(original)) === 'object' ? cloneDeep(original) : original;
+        }
+    });
+
+    // config is not enumerable
+    instance.config = cloneDeep(Vue.config);
+
+    // instance.config.errorHandler = errorHandler
+
+    // option merge strategies need to be exposed by reference
+    // so that merge strats registered by plguins can work properly
+    instance.config.optionMergeStrategies = Vue.config.optionMergeStrategies;
+
+    // make sure all extends are based on this instance.
+    // this is important so that global components registered by plugins,
+    // e.g. router-link are created using the correct base constructor
+    instance.options._base = instance;
+
+    // compat for vue-router < 2.7.1 where it does not allow multiple installs
+    if (instance._installedPlugins && instance._installedPlugins.length) {
+        instance._installedPlugins.length = 0;
+    }
+
+    var use = instance.use;
+
+    instance.use = function (plugin) {
+        for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+            rest[_key - 1] = arguments[_key];
+        }
+
+        if (plugin.installed === true) {
+            plugin.installed = false;
+        }
+
+        if (plugin.install && plugin.install.installed === true) {
+            plugin.install.installed = false;
+        }
+
+        use.call.apply(use, [instance, plugin].concat(rest));
+    };
+
+    return instance;
+};
 
 /**
  * Make a function that returns a component factory.
@@ -126,13 +181,14 @@ var factory = function () {
     var factoryOpts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
     factoryOpts.components = factoryOpts.components || {};
-    // factoryOpts.modules = factoryOpts.modules || {};
     factoryOpts.routes = factoryOpts.routes || [];
 
     //
     // component factory
     //
     return function (options, state) {
+        var ClonedVue = cloneConstructor();
+
         var baseOptions = {
             components: factoryOpts.components,
             el: document.createElement('div'),
@@ -150,7 +206,7 @@ var factory = function () {
         if ((factoryOpts.modules || state) && !Vuex) {
             console.warn('Missing "vuex" dependency, no state will be injected.');
         } else {
-            store = createStore(factoryOpts.modules || {}, state || {});
+            store = createStore(ClonedVue, factoryOpts.modules || {}, state || {});
 
             baseOptions.store = store;
         }
@@ -166,7 +222,7 @@ var factory = function () {
         if (factoryOpts.routes && !VueRouter) {
             console.warn('Missing "vue-router" dependency, no router will be injected.');
         } else {
-            router = createRouter(factoryOpts.routes);
+            router = createRouter(ClonedVue, factoryOpts.routes);
 
             baseOptions.router = router;
         }
@@ -184,14 +240,25 @@ var factory = function () {
             }
         }
 
+        // stub transition components
+        if (factoryOpts.stubTransitions) {
+            ClonedVue.component('transition', {
+                render: function render() {
+                    return this.$slots.default[0];
+                },
+
+                abstract: true
+            });
+        }
+
         // finally, return the instantiated vue component
-        return new Vue(Object.assign(baseOptions, options));
+        return new ClonedVue(Object.assign(baseOptions, options));
     };
 };
 
 // helper function to create a router instance
-function createRouter() {
-    var routes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+function createRouter(ClonedVue) {
+    var routes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
     var VueRouter = require('vue-router');
 
@@ -199,10 +266,7 @@ function createRouter() {
         VueRouter = VueRouter.default;
     }
 
-    if (!routerIsInstalled) {
-        Vue.use(VueRouter);
-        routerIsInstalled = true;
-    }
+    ClonedVue.use(VueRouter);
 
     var normalizedRoutes = routes.map(function (route) {
         return typeof route === 'string' ? stubRoute(route) : route;
@@ -215,17 +279,14 @@ function createRouter() {
 }
 
 // helper function to create a vuex store instance
-function createStore(rawModules, state) {
+function createStore(ClonedVue, rawModules, state) {
     var Vuex = require('vuex');
 
     if (typeof Vuex.default !== 'undefined') {
         Vuex = Vuex.default;
     }
 
-    if (!vuexIsInstalled) {
-        Vue.use(Vuex);
-        vuexIsInstalled = true;
-    }
+    ClonedVue.use(Vuex);
 
     // create a normalized copy of our vuex modules
     var normalizedModules = normalizeModules(rawModules);

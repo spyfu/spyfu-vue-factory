@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import { factory } from '../../lib';
-import Vue from 'vue/dist/vue.common.js';
 
 //
 // factory

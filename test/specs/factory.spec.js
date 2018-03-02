@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { factory } from '../../lib';
+import Vue from 'vue/dist/vue.common.js';
 
 //
 // factory
@@ -129,6 +130,25 @@ describe('factory', () => {
         vm.$nextTick(() => {
             expect(vm.$el.outerHTML).to.equal('<div>Bar</div>');
             done();
-        })
+        });
+    });
+
+    it('accepts a customized constructor', () => {
+        const cloneVue = require('../../lib/clone_constructor').default;
+        const CustomVue = cloneVue();
+
+        CustomVue.component('whatever', {
+            template: `<div>hello from whatever</div>`,
+        });
+
+        const customVue = factory({
+            Vue: CustomVue,
+        });
+
+        const vm = customVue({
+            template: `<whatever />`
+        });
+
+        expect(vm.$el.textContent).to.equal('hello from whatever');
     })
 });

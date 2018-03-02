@@ -110,11 +110,12 @@ var stubRoute = function (name) {
 // included with vue-test-utils, because they do not use
 // the compiler-included version of Vue as their base.
 // https://github.com/vuejs/vue-test-utils/blob/dev/src/create-local-vue.js
-var Vue = require('vue/dist/vue.common.js');
 var cloneDeep = require('lodash.clonedeep');
 // import errorHandler from './lib/error-handler'
 
-var cloneConstructor = function () {
+var cloneConstructor = function (factoryOpts) {
+    var Vue = factoryOpts && factoryOpts.Vue ? factoryOpts.Vue : require('vue/dist/vue.common.js');
+
     var instance = Vue.extend();
 
     // clone global APIs
@@ -181,7 +182,7 @@ var factory = function () {
     // component factory
     //
     return function (options, state) {
-        var ClonedVue = cloneConstructor();
+        var ClonedVue = cloneConstructor(factoryOpts);
 
         var baseOptions = {
             components: factoryOpts.components,

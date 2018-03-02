@@ -88,6 +88,16 @@ const mount = factory({
 });
 ```
 
+### Using a custom Vue constructor
+
+Optionally, the factory can work with a sub-classed Vue constructor. To do this, provide a `Vue` property in your factory options.
+
+```js
+const mount = factory({
+    Vue: Vue.extend(/* ... */),
+});
+```
+
 ### License
 
 [MIT](https://github.com/spyfu/spyfu-vue-factory/blob/master/LICENSE)

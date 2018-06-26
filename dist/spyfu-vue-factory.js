@@ -274,7 +274,7 @@ function createRouter(ClonedVue) {
     });
 
     return new VueRouter({
-        abstract: true,
+        mode: 'abstract',
         routes: normalizedRoutes
     });
 }

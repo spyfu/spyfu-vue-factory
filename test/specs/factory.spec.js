@@ -37,9 +37,6 @@ const render = factory({
         },
     },
     stubTransitions: true,
-    routes: [
-        'foo',
-    ]
 });
 
 //

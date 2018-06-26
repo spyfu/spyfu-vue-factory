@@ -37,6 +37,9 @@ const render = factory({
         },
     },
     stubTransitions: true,
+    routes: [
+        'foo',
+    ]
 });
 
 //
@@ -150,4 +153,10 @@ describe('factory', () => {
 
         expect(vm.$el.textContent).to.equal('hello from whatever');
     })
+
+    it('uses abstract mode for vue router', function () {
+        const vm = render();
+
+        expect(vm.$router.mode).to.equal('abstract');
+    });
 });

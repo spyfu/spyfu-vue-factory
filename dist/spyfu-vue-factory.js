@@ -10,6 +10,66 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
 
+// unfortunately, we can't use the version of this that is
+// included with vue-test-utils, because they do not use
+// the compiler-included version of Vue as their base.
+// https://github.com/vuejs/vue-test-utils/blob/dev/src/create-local-vue.js
+var cloneDeep = require('lodash.clonedeep');
+// import errorHandler from './lib/error-handler'
+
+var cloneConstructor = function (factoryOpts) {
+    var Vue = factoryOpts && factoryOpts.Vue ? factoryOpts.Vue : require('vue/dist/vue.common.js');
+
+    var instance = Vue.extend();
+
+    // clone global APIs
+    Object.keys(Vue).forEach(function (key) {
+        if (!instance.hasOwnProperty(key)) {
+            var original = Vue[key];
+            instance[key] = (typeof original === 'undefined' ? 'undefined' : _typeof(original)) === 'object' ? cloneDeep(original) : original;
+        }
+    });
+
+    // config is not enumerable
+    instance.config = cloneDeep(Vue.config);
+
+    // instance.config.errorHandler = errorHandler
+
+    // option merge strategies need to be exposed by reference
+    // so that merge strats registered by plguins can work properly
+    instance.config.optionMergeStrategies = Vue.config.optionMergeStrategies;
+
+    // make sure all extends are based on this instance.
+    // this is important so that global components registered by plugins,
+    // e.g. router-link are created using the correct base constructor
+    instance.options._base = instance;
+
+    // compat for vue-router < 2.7.1 where it does not allow multiple installs
+    if (instance._installedPlugins && instance._installedPlugins.length) {
+        instance._installedPlugins.length = 0;
+    }
+
+    var use = instance.use;
+
+    instance.use = function (plugin) {
+        for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+            rest[_key - 1] = arguments[_key];
+        }
+
+        if (plugin.installed === true) {
+            plugin.installed = false;
+        }
+
+        if (plugin.install && plugin.install.installed === true) {
+            plugin.install.installed = false;
+        }
+
+        use.call.apply(use, [instance, plugin].concat(rest));
+    };
+
+    return instance;
+};
+
 var isMergeableObject = function isMergeableObject(value) {
 	return isNonNullObject(value) && !isSpecial(value);
 };
@@ -112,65 +172,7 @@ var stubRoute = function (name) {
     };
 };
 
-// unfortunately, we can't use the version of this that is
-// included with vue-test-utils, because they do not use
-// the compiler-included version of Vue as their base.
-// https://github.com/vuejs/vue-test-utils/blob/dev/src/create-local-vue.js
-var cloneDeep = require('lodash.clonedeep');
-// import errorHandler from './lib/error-handler'
-
-var cloneConstructor = function (factoryOpts) {
-    var Vue = factoryOpts && factoryOpts.Vue ? factoryOpts.Vue : require('vue/dist/vue.common.js');
-
-    var instance = Vue.extend();
-
-    // clone global APIs
-    Object.keys(Vue).forEach(function (key) {
-        if (!instance.hasOwnProperty(key)) {
-            var original = Vue[key];
-            instance[key] = (typeof original === 'undefined' ? 'undefined' : _typeof(original)) === 'object' ? cloneDeep(original) : original;
-        }
-    });
-
-    // config is not enumerable
-    instance.config = cloneDeep(Vue.config);
-
-    // instance.config.errorHandler = errorHandler
-
-    // option merge strategies need to be exposed by reference
-    // so that merge strats registered by plguins can work properly
-    instance.config.optionMergeStrategies = Vue.config.optionMergeStrategies;
-
-    // make sure all extends are based on this instance.
-    // this is important so that global components registered by plugins,
-    // e.g. router-link are created using the correct base constructor
-    instance.options._base = instance;
-
-    // compat for vue-router < 2.7.1 where it does not allow multiple installs
-    if (instance._installedPlugins && instance._installedPlugins.length) {
-        instance._installedPlugins.length = 0;
-    }
-
-    var use = instance.use;
-
-    instance.use = function (plugin) {
-        for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-            rest[_key - 1] = arguments[_key];
-        }
-
-        if (plugin.installed === true) {
-            plugin.installed = false;
-        }
-
-        if (plugin.install && plugin.install.installed === true) {
-            plugin.install.installed = false;
-        }
-
-        use.call.apply(use, [instance, plugin].concat(rest));
-    };
-
-    return instance;
-};
+var optionalRequire = require("optional-require")(require);
 
 /**
  * Make a function that returns a component factory.

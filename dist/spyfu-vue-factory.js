@@ -172,8 +172,6 @@ var stubRoute = function (name) {
     };
 };
 
-var optionalRequire = require("optional-require")(require);
-
 /**
  * Make a function that returns a component factory.
  *
@@ -231,16 +229,8 @@ var factory = function () {
         }
 
         // sync the store with the router
-        if (store && router) {
-            try {
-                var VuexRouterSync = optionalRequire('vuex-router-sync') || null;
-
-                if (VuexRouterSync) {
-                    VuexRouterSync.sync(store, router);
-                }
-            } catch (e) {
-                // continue, regardless of error
-            }
+        if (typeof factoryOpts.sync === 'function' && store && router) {
+            factoryOpts.sync(store, router);
         }
 
         // stub transition components

@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { factory } from '../../lib';
+import { sync } from 'vuex-router-sync';
 
 //
 // factory
@@ -37,6 +38,7 @@ const render = factory({
         },
     },
     stubTransitions: true,
+    sync,
 });
 
 //
@@ -155,5 +157,11 @@ describe('factory', () => {
         const vm = render();
 
         expect(vm.$router.mode).to.equal('abstract');
+    });
+
+    it('it applies vuex-router-sync', () => {
+        const vm = render();
+        
+        expect(typeof vm.$store.state.route).to.equal('object');
     });
 });

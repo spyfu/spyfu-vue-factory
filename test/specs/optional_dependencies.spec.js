@@ -36,13 +36,4 @@ describe('optional dependencies', () => {
         expect(warn.called).to.be.true;
         expect(vm.$router).to.be.undefined;
     });
-
-    it('vuex-router-sync', () => {
-        mock('vuex-router-sync', undefined);
-
-        const render = factory({ modules: {}, routes: [] });
-        const vm = render({});
-        
-        expect(vm.$store.state.route).to.be.undefined;
-    });
 });

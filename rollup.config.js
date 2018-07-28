@@ -56,7 +56,12 @@ else {
 }
 
 export default {
-    external: ['vue', 'vue-router', 'vuex', 'vuex-router-sync'],
+    external: [
+        'vue', 
+        'vue-router', 
+        'vuex', 
+        'vuex-router-sync',
+    ],
     input: 'lib/index.js',
     output: output,
     plugins: plugins,

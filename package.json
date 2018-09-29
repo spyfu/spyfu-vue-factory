@@ -5,7 +5,7 @@
   "main": "dist/spyfu-vue-factory.js",
   "module": "dist/spyfu-vue-factory.esm.js",
   "jsnext:main": "dist/spyfu-vue-factory.esm.js",
-  "typings": "types/index.d.ts",
+  "types": "index.d.ts",
   "scripts": {
     "prebuild": "eslint lib test",
     "build": "cross-env NODE_ENV=production rollup -c",
@@ -28,7 +28,7 @@
   "files": [
     "lib",
     "dist",
-    "types/*.d.ts"
+    "index.d.ts"
   ],
   "homepage": "https://github.com/spyfu/spyfu-vue-factory#readme",
   "dependencies": {

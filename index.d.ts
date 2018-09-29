@@ -9,7 +9,5 @@ declare module 'spyfu-vue-factory' {
         sync?: any,
     }
 
-    export function MountFunction (options?: Component, state?: object): Vue;
-    
-    export function factory(options?: FactoryOptions): MountFunction;
+    export function factory(factoryOptions?: FactoryOptions): (componentOptions?: Component, state?: object) => Vue;
 }

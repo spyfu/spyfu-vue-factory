@@ -1,5 +1,5 @@
-import { ComponentOptions } from 'vue';
+import { Component } from 'vue';
 
 declare module 'spyfu-vue-factory' {
-    export function factory(options: ComponentOptions, state: object | undefined): any;
+    export function factory(options?: Component, state?: object): any;
 }

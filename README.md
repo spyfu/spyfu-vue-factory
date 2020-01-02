@@ -6,6 +6,8 @@
 [![npm](https://img.shields.io/npm/v/spyfu-vue-factory.svg)](https://www.npmjs.com/package/spyfu-vue-factory)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/spyfu/spyfu-vue-factory/blob/master/LICENSE)
 
+> **DEPRECATED:** This package is no longer maintained, we recommend using [this first party package](https://vue-test-utils.vuejs.org/) instead.
+
 <a name="installation"></a>
 ### Installation
 
